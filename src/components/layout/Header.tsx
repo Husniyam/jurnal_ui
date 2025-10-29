@@ -18,11 +18,6 @@ export default function Header() {
 	const { user, logout } = useAuth()
 	const router = useRouter()
 
-	// const logoutbutton = () => {
-	// 	logout
-	// 	// router.push('/login')
-	// }
-
 	return (
 		<div>
 			<header className='h-20 bg-background border-b flex flex-col justify-center px-4 sticky top-0 z-20'>
@@ -55,7 +50,7 @@ export default function Header() {
 					</div>
 				</div>
 			</header>
-			<div className='h-15 bg-transparent border-b  flex flex-col justify-center mx-4 sticky top-0 z-20'>
+			<div className='h-15 bg-transparent border-b  flex flex-col justify-center mx-4 sticky top-0'>
 				<Breadcrumbs />
 			</div>
 		</div>

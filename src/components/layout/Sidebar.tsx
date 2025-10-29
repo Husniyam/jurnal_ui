@@ -45,9 +45,7 @@ export default function Sidebar() {
 					open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
 				)}
 			>
-				<h2 className='text-xl font-bold mb-6 text-primary text-center'>
-					Startup 3.0
-				</h2>
+				<h2 className='text-xl font-bold mb-6 text-primary text-center'>QLD</h2>
 				<nav className='flex flex-col space-y-2'>
 					{menu.map(item => {
 						const Icon = item.icon

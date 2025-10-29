@@ -1,6 +1,7 @@
 import ProtectedRoute from '@/components/layout/protectedRoute'
 import { ThemeProvider } from '@/components/ui/shared/theme-provider'
 import { AuthProvider } from '@/lib/auth'
+import QueryProvider from '@/lib/queryClient'
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
@@ -31,17 +32,20 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<ThemeProvider
-					attribute='class'
-					defaultTheme='light'
-					enableSystem
-					disableTransitionOnChange
-				>
-					<AuthProvider>
-						<ProtectedRoute>{children}</ProtectedRoute>
-						<Toaster />
-					</AuthProvider>
-				</ThemeProvider>
+				<QueryProvider>
+					<ThemeProvider
+						attribute='class'
+						defaultTheme='light'
+						enableSystem
+						disableTransitionOnChange
+					>
+						<AuthProvider>
+							{' '}
+							<ProtectedRoute>{children}</ProtectedRoute>
+							<Toaster />
+						</AuthProvider>
+					</ThemeProvider>
+				</QueryProvider>
 			</body>
 		</html>
 	)
