@@ -19,94 +19,29 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table'
+import { useLokomotivlar } from '@/hooks/useLokomotiv'
+import { useSexlar } from '@/hooks/useSex'
+import { useUzellar } from '@/hooks/useUzel'
+import { Uzel } from '@/types/uzel'
 import { Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-// --- TYPES ---
-interface Uzel {
-	id: string
-	nomi: string
-	raqami: string
-	holati: string
-	sexId?: string
-	lokomotivId?: string
-	sana: string // oxirgi ta’mir sanasi
-	tamirDavri: number // oy hisobida
-}
-
-interface Sex {
-	id: string
-	nomi: string
-}
-
-interface Lokomotiv {
-	id: string
-	nomi: string
-	zavodRaqami: string
-}
+import AddUzelModal from './components/AddUzelModal'
 
 // --- KOMPONENT ---
 export default function UzelPage() {
-	const [uzellar, setUzellar] = useState<Uzel[]>([])
 	const [filtered, setFiltered] = useState<Uzel[]>([])
-	const [sexlar, setSexlar] = useState<Sex[]>([])
-	const [lokomotivlar, setLokomotivlar] = useState<Lokomotiv[]>([])
 	const [search, setSearch] = useState('')
+	const [open, setOpen] = useState(false)
 	const [holatFilter, setHolatFilter] = useState('')
-
-	// --- FAKE DATA ---
-	useEffect(() => {
-		const uzelData: Uzel[] = [
-			{
-				id: '1',
-				nomi: 'Generator',
-				raqami: 'U001',
-				holati: 'ish holatida',
-				lokomotivId: 'L1',
-				sana: '2025-09-15',
-				tamirDavri: 2,
-			},
-			{
-				id: '2',
-				nomi: 'Kompresor',
-				raqami: 'U002',
-				holati: 'sexda',
-				sexId: 'S1',
-				sana: '2025-08-20',
-				tamirDavri: 1,
-			},
-			{
-				id: '3',
-				nomi: 'Transformator',
-				raqami: 'U003',
-				holati: 'ish holatida',
-				lokomotivId: 'L2',
-				sana: '2025-10-01',
-				tamirDavri: 3,
-			},
-		]
-
-		const sexData: Sex[] = [
-			{ id: 'S1', nomi: '1-seksiya' },
-			{ id: 'S2', nomi: '2-seksiya' },
-		]
-
-		const lokoData: Lokomotiv[] = [
-			{ id: 'L1', nomi: 'TE33A', zavodRaqami: 'Z123' },
-			{ id: 'L2', nomi: 'UZTE16M', zavodRaqami: 'Z456' },
-		]
-
-		setUzellar(uzelData)
-		setFiltered(uzelData)
-		setSexlar(sexData)
-		setLokomotivlar(lokoData)
-	}, [])
+	const { data: uzellar = [] } = useUzellar()
+	const { data: lokomotivlar = [] } = useLokomotivlar()
+	const { data: sexlar = [] } = useSexlar()
 
 	// --- FILTERS ---
 	useEffect(() => {
 		let result = uzellar.filter(
 			u =>
-				u.nomi.toLowerCase().includes(search.toLowerCase()) ||
+				u.uzeltype.nomi.toLowerCase().includes(search.toLowerCase()) ||
 				u.raqami.toLowerCase().includes(search.toLowerCase())
 		)
 		if (holatFilter) {
@@ -115,15 +50,15 @@ export default function UzelPage() {
 				: (result = result)
 		}
 		setFiltered(result)
-	}, [search, holatFilter, uzellar])
+	}, [search, holatFilter])
 
 	// --- JOY FUNKSIYASI ---
 	const getJoy = (uzel: Uzel) => {
-		if (uzel.holati === 'ish holatida' && uzel.lokomotivId) {
-			const loko = lokomotivlar.find(l => l.id === uzel.lokomotivId)
+		if (uzel.holati === 'Ish holatida' && uzel.lokomotiv) {
+			const loko = lokomotivlar.find(l => l._id === uzel.lokomotiv._id)
 			return loko ? `${loko.nomi} (${loko.zavodRaqami})` : '—'
-		} else if (uzel.sexId) {
-			const sex = sexlar.find(s => s.id === uzel.sexId)
+		} else if (uzel.sex) {
+			const sex = sexlar.find(s => s._id === uzel.sex._id)
 			return sex ? sex.nomi : '—'
 		}
 		return '—'
@@ -133,7 +68,7 @@ export default function UzelPage() {
 	const getQolganKun = (uzel: Uzel) => {
 		const oxirgiTamir = new Date(uzel.sana)
 		const bugun = new Date()
-		const tamirMuddat = uzel.tamirDavri * 30 // oy → kun
+		const tamirMuddat = +uzel.uzeltype.korikmuddat * 30 // oy → kun
 		const farq = Math.floor(
 			(bugun.getTime() - oxirgiTamir.getTime()) / (1000 * 60 * 60 * 24)
 		)
@@ -163,14 +98,17 @@ export default function UzelPage() {
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value='barchasi'>Barchasi</SelectItem>
-							<SelectItem value='ish holatida'>Ish holatida</SelectItem>
+							<SelectItem value='Ish holatida'>Ish holatida</SelectItem>
 							<SelectItem value='sexda'>Sexda</SelectItem>
-							<SelectItem value='ta’mirda'>Ta’mirda</SelectItem>
+							<SelectItem value='Tamirda'>Ta’mirda</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
 
-				<Button className='flex items-center gap-2'>
+				<Button
+					className='flex items-center gap-2 cursor-pointer'
+					onClick={() => setOpen(!open)}
+				>
 					<Plus className='h-4 w-4' />
 					Qo‘shish
 				</Button>
@@ -196,43 +134,54 @@ export default function UzelPage() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{filtered.map((u, i) => {
-									const qolgan = getQolganKun(u)
-									return (
-										<TableRow key={u.id}>
-											<TableCell>{i + 1}</TableCell>
-											<TableCell>{u.nomi}</TableCell>
-											<TableCell>{u.raqami}</TableCell>
-											<TableCell>
-												<Badge
-													variant={
-														u.holati === 'ish holatida'
-															? 'default'
-															: u.holati === 'sexda'
-															? 'secondary'
-															: 'destructive'
-													}
-												>
-													{u.holati}
-												</Badge>
-											</TableCell>
-											<TableCell>{getJoy(u)}</TableCell>
-											<TableCell>{u.sana}</TableCell>
-											<TableCell>
-												<Badge variant={getBadgeVariant(qolgan)}>
-													{qolgan > 0
-														? `${qolgan} kun qoldi`
-														: `${Math.abs(qolgan)} kun o‘tgan`}
-												</Badge>
-											</TableCell>
-										</TableRow>
-									)
-								})}
+								{filtered.length ? (
+									filtered.map((u, i) => {
+										const qolgan = getQolganKun(u)
+										return (
+											<TableRow key={u._id}>
+												<TableCell>{i + 1}</TableCell>
+												<TableCell>{u.uzeltype.nomi}</TableCell>
+												<TableCell>{u.raqami}</TableCell>
+												<TableCell>
+													<Badge
+														variant={
+															u.holati === 'ish holatida'
+																? 'default'
+																: u.holati === 'sexda'
+																? 'secondary'
+																: 'destructive'
+														}
+													>
+														{u.holati}
+													</Badge>
+												</TableCell>
+												<TableCell>{getJoy(u)}</TableCell>
+												<TableCell>
+													{u.sana ? new Date(u.sana).toLocaleDateString() : '-'}
+												</TableCell>
+												<TableCell>
+													<Badge variant={getBadgeVariant(qolgan)}>
+														{qolgan > 0
+															? `${qolgan} kun qoldi`
+															: `${Math.abs(qolgan)} kun o‘tgan`}
+													</Badge>
+												</TableCell>
+											</TableRow>
+										)
+									})
+								) : (
+									<TableRow>
+										<TableCell colSpan={7} className='text-center py-4'>
+											Hech qanday natija topilmadi 😕
+										</TableCell>
+									</TableRow>
+								)}
 							</TableBody>
 						</Table>
 					</div>
 				</CardContent>
 			</Card>
+			<AddUzelModal open={open} onClose={() => setOpen(false)} />
 		</div>
 	)
 }

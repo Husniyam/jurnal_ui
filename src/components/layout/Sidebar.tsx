@@ -19,7 +19,7 @@ const menu = [
 	{ href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
 	{ href: '/sex', icon: Factory, label: 'Sexlar' },
 	{ href: '/jurnal', icon: BookText, label: 'Jurnallar' },
-	{ href: '/uzel', icon: Wrench, label: 'Uzel-agregatlar' },
+	{ href: '/uzelturlari', icon: Wrench, label: 'Uzel-turlari' },
 	{ href: '/lokomotiv', icon: TrainFront, label: 'Lokomotivlar' },
 	{ href: '/xodim', icon: Users, label: 'Xodimlar' },
 ]

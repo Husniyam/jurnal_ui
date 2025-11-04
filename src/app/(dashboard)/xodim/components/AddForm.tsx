@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select'
 import { useSexlar } from '@/hooks/useSex'
 import { useAddXodim } from '@/hooks/useXodim' // post qilish uchun
+import { Sex } from '@/types/sex'
 import { toast } from 'sonner'
 import { xodimSchema, XodimSchema } from './zodXodimSchema'
 
@@ -105,9 +106,9 @@ export function AddXodimForm({ onClose }: Props) {
 						<SelectValue placeholder='Sex tanlang' />
 					</SelectTrigger>
 					<SelectContent>
-						{sexlar.map((sex: any) => (
+						{sexlar.map((sex: Sex) => (
 							<SelectItem key={sex._id} value={sex._id}>
-								{sex.nomi} ({sex.joylashuvi})
+								{sex.nomi} ({sex.joylashuv})
 							</SelectItem>
 						))}
 					</SelectContent>

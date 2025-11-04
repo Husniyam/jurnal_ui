@@ -195,7 +195,7 @@ export default function DashboardPage() {
 							</ResponsiveContainer>
 
 							{/* legend */}
-							<div className='flex gap-4 mt-4 justify-center'>
+							<div className='flex gap-4  justify-center'>
 								{pieData.map((p, i) => (
 									<div key={p.name} className='flex items-center gap-2 text-sm'>
 										<span

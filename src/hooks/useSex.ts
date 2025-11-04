@@ -2,15 +2,6 @@ import { sexService } from '@/services/sexService'
 import { CreateSexDto } from '@/types/sex'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-// export function useSexlar() {
-// 	return useQuery({
-// 		queryKey: ['sexlar'],
-// 		queryFn: async () => {
-// 			const { data } = await api.get('/sex')
-// 			return data
-// 		},
-// 	})
-// }
 export function useSexlar() {
 	return useQuery({
 		queryKey: ['sex'],

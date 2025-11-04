@@ -5,13 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
-import {
 	Table,
 	TableBody,
 	TableCell,
@@ -19,78 +12,31 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table'
+import { useJurnallar } from '@/hooks/useJurnal'
+import { Jurnal } from '@/types/jurnal'
 import { Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-// --- TYPES ---
-interface Jurnal {
-	id: string
-	lokomotiv: string
-	yechilganuzel: string
-	yechganxodim: string
-	tamirturi: string
-	status: 'Yangi' | 'Jarayonda' | 'Yakunlangan'
-	yechgansana: string
-	qoyganxodim?: string
-	qoyilganuzel?: string
-	qoyilgansana?: string
-}
+import AddModal from './components/AddJurnalModal'
+import EditJurnalModal from './components/EditJurnalModal'
 
 // --- KOMPONENT ---
 export default function JurnalPage() {
-	const [jurnallar, setJurnallar] = useState<Jurnal[]>([])
 	const [filtered, setFiltered] = useState<Jurnal[]>([])
 	const [search, setSearch] = useState('')
+	const [editOpen, setEditOpen] = useState(false)
+	const [open, setOpen] = useState(false)
 	const [statusFilter, setStatusFilter] = useState('')
-
-	useEffect(() => {
-		// FAKE DATA
-		const data: Jurnal[] = [
-			{
-				id: '1',
-				lokomotiv: 'TE33A - Z123',
-				yechilganuzel: 'Generator',
-				yechganxodim: 'Aliyev D.',
-				tamirturi: 'Kapital',
-				status: 'Yangi',
-				yechgansana: '2025-10-02',
-			},
-			{
-				id: '2',
-				lokomotiv: 'UZTE16M - Z456',
-				yechilganuzel: 'Transformator',
-				yechganxodim: 'Karimov R.',
-				tamirturi: 'Joriy',
-				status: 'Jarayonda',
-				yechgansana: '2025-09-28',
-				qoyganxodim: 'Saidov B.',
-				qoyilganuzel: 'Transformator-2',
-				qoyilgansana: '2025-10-05',
-			},
-			{
-				id: '3',
-				lokomotiv: 'TE33A - Z789',
-				yechilganuzel: 'Kompresor',
-				yechganxodim: 'Rahimova N.',
-				tamirturi: 'Kapital',
-				status: 'Yakunlangan',
-				yechgansana: '2025-08-15',
-				qoyganxodim: 'Aliyev D.',
-				qoyilganuzel: 'Kompresor-1',
-				qoyilgansana: '2025-09-01',
-			},
-		]
-		setJurnallar(data)
-		setFiltered(data)
-	}, [])
+	const { data: jurnallar = [] } = useJurnallar()
+	const [selectedJurnal, setSelectedJurnal] = useState<Jurnal>()
+	console.log(jurnallar)
 
 	// FILTER & SEARCH
 	useEffect(() => {
 		let result = jurnallar.filter(
 			j =>
-				j.lokomotiv.toLowerCase().includes(search.toLowerCase()) ||
-				j.yechilganuzel.toLowerCase().includes(search.toLowerCase()) ||
-				j.yechganxodim.toLowerCase().includes(search.toLowerCase())
+				j.lokomotiv.nomi.toLowerCase().includes(search.toLowerCase()) ||
+				j.yechilganuzel.raqami.toLowerCase().includes(search.toLowerCase()) ||
+				j.yechganXodim.ism.toLowerCase().includes(search.toLowerCase())
 		)
 		if (statusFilter) {
 			result = result.filter(j => j.status === statusFilter)
@@ -100,11 +46,11 @@ export default function JurnalPage() {
 
 	const getStatusBadge = (status: string) => {
 		switch (status) {
-			case 'Yangi':
-				return <Badge variant='default'>Yangi</Badge>
+			case 'Tamirda':
+				return <Badge variant='default'>Tamirda</Badge>
 			case 'Jarayonda':
 				return <Badge variant='secondary'>Jarayonda</Badge>
-			case 'Yakunlangan':
+			case 'Ish holatida':
 				return <Badge variant='outline'>Yakunlangan</Badge>
 			default:
 				return <Badge variant='outline'>—</Badge>
@@ -122,20 +68,22 @@ export default function JurnalPage() {
 						onChange={e => setSearch(e.target.value)}
 						className='max-w-xs'
 					/>
-					<Select value={statusFilter} onValueChange={setStatusFilter}>
+					{/* <Select value={statusFilter} onValueChange={setStatusFilter}>
 						<SelectTrigger className='w-[180px]'>
 							<SelectValue placeholder='Status bo‘yicha filter' />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value='barchasi'>Barchasi</SelectItem>
-							<SelectItem value='Yangi'>Yangi</SelectItem>
-							<SelectItem value='Jarayonda'>Jarayonda</SelectItem>
-							<SelectItem value='Yakunlangan'>Yakunlangan</SelectItem>
+							<SelectItem value='Barchasi'>Barchasi</SelectItem>
+							<SelectItem value='Tamirda'>Tamirda</SelectItem>
+							<SelectItem value='Ish holatida'>Ish holatida</SelectItem>
 						</SelectContent>
-					</Select>
+					</Select> */}
 				</div>
 
-				<Button className='flex items-center gap-2'>
+				<Button
+					className='flex items-center gap-2'
+					onClick={() => setOpen(!open)}
+				>
 					<Plus className='h-4 w-4' />
 					Yangi jurnal
 				</Button>
@@ -153,36 +101,77 @@ export default function JurnalPage() {
 								<TableRow>
 									<TableHead>T/r</TableHead>
 									<TableHead>Lokomotiv</TableHead>
-									<TableHead>Yechilgan uzel</TableHead>
+									<TableHead>Uzel turi</TableHead>
+									<TableHead>Yechilgan uzel raqami</TableHead>
 									<TableHead>Yechgan xodim</TableHead>
 									<TableHead>Yechilgan sana</TableHead>
 									<TableHead>Ta’mir turi</TableHead>
-									<TableHead>Qo‘yilgan uzel</TableHead>
+									<TableHead>Qo‘yilgan uzel raqami</TableHead>
 									<TableHead>Qo‘ygan xodim</TableHead>
 									<TableHead>Qo‘yilgan sana</TableHead>
 									<TableHead>Status</TableHead>
+									<TableHead>Amallar</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{filtered.map((j, i) => (
-									<TableRow key={j.id}>
-										<TableCell>{i + 1}</TableCell>
-										<TableCell>{j.lokomotiv}</TableCell>
-										<TableCell>{j.yechilganuzel}</TableCell>
-										<TableCell>{j.yechganxodim}</TableCell>
-										<TableCell>{j.yechgansana}</TableCell>
-										<TableCell>{j.tamirturi}</TableCell>
-										<TableCell>{j.qoyilganuzel || '—'}</TableCell>
-										<TableCell>{j.qoyganxodim || '—'}</TableCell>
-										<TableCell>{j.qoyilgansana || '—'}</TableCell>
-										<TableCell>{getStatusBadge(j.status)}</TableCell>
+								{filtered ? (
+									filtered.map((j, i) => (
+										<TableRow key={j._id}>
+											<TableCell>{i + 1}</TableCell>
+											<TableCell>
+												{j.lokomotiv?.nomi} {j.lokomotiv?.zavodRaqami}
+											</TableCell>
+											<TableCell>{j.yechilganuzel?.uzeltype.nomi}</TableCell>
+											<TableCell>{j.yechilganuzel?.raqami}</TableCell>
+											<TableCell>
+												{j.yechganXodim?.ism} {j.yechganXodim?.familiya}
+											</TableCell>
+											<TableCell>
+												{j.yechilganSana
+													? j.yechilganSana.toLocaleString().slice(0, 10)
+													: '—'}
+											</TableCell>
+											<TableCell>{j?.tamirTuri}</TableCell>
+											<TableCell>{j.qoyilganuzel?.raqami || '—'}</TableCell>
+											<TableCell>{j.qoyganXodim?.ism || '—'}</TableCell>
+											<TableCell>
+												{j.qoyilganSana
+													? j.qoyilganSana.toLocaleString().slice(0, 10)
+													: '—'}
+											</TableCell>
+											<TableCell>{getStatusBadge(j.status)}</TableCell>
+											<TableCell>
+												<Button
+													className='cursor-pointer'
+													onClick={() => {
+														setSelectedJurnal(j)
+														setEditOpen(!editOpen)
+													}}
+												>
+													Edit
+												</Button>
+											</TableCell>
+										</TableRow>
+									))
+								) : (
+									<TableRow>
+										<TableCell colSpan={7} className='text-center py-4'>
+											Hech qanday natija topilmadi 😕
+										</TableCell>
 									</TableRow>
-								))}
+								)}
 							</TableBody>
 						</Table>
 					</div>
 				</CardContent>
 			</Card>
+
+			<AddModal open={open} onClose={() => setOpen(false)} />
+			<EditJurnalModal
+				open={editOpen}
+				onClose={() => setEditOpen(false)}
+				selectedJurnal={selectedJurnal}
+			/>
 		</div>
 	)
 }
