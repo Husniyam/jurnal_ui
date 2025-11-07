@@ -31,8 +31,8 @@ export function AddSexForm({ onClose }: Props) {
 			await mutateAsync(data)
 			onClose()
 			toast.success('Sex muvaffaqiyatli qo‘shildi ✅')
-		} catch (err: any) {
-			toast.error(err.response?.data?.message || 'Xatolik yuz berdi ❌')
+		} catch (err) {
+			toast.error(`Xatolik yuz berdi ❌ ${err}`)
 		}
 	}
 

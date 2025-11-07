@@ -32,7 +32,7 @@ export default function Sidebar() {
 		<>
 			{/* Mobil menyu tugmasi */}
 			<button
-				className='md:hidden fixed top-4 left-4 z-30 bg-primary text-white p-2 rounded-lg'
+				className='md:hidden fixed top-4 left-4 z-30 bg-sidebar-primary text-sidebar-primary-foreground p-2 rounded-lg'
 				onClick={() => setOpen(!open)}
 			>
 				{open ? <X /> : <Menu />}
@@ -41,11 +41,13 @@ export default function Sidebar() {
 			{/* Sidebar */}
 			<aside
 				className={clsx(
-					'fixed md:static top-0 left-0 z-20 w-64 h-full bg-card border-r flex flex-col p-4 transition-transform',
+					'fixed md:static top-5 left-0 z-20 w-64 h-full bg-card border-r flex flex-col p-4 transition-transform',
 					open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
 				)}
 			>
-				<h2 className='text-xl font-bold mb-6 text-primary text-center'>QLD</h2>
+				<h2 className='text-xl font-bold mb-6 text-card-foreground text-center'>
+					QLD
+				</h2>
 				<nav className='flex flex-col space-y-2'>
 					{menu.map(item => {
 						const Icon = item.icon
@@ -58,7 +60,7 @@ export default function Sidebar() {
 								className={clsx(
 									'flex items-center gap-3 p-2 rounded-lg transition-colors',
 									active
-										? 'bg-primary text-white'
+										? 'bg-sidebar-primary text-sidebar-primary-foreground'
 										: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 								)}
 								onClick={() => setOpen(false)}

@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
+import {
 	Table,
 	TableBody,
 	TableCell,
@@ -15,34 +22,46 @@ import {
 import { useJurnallar } from '@/hooks/useJurnal'
 import { Jurnal } from '@/types/jurnal'
 import { Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import AddModal from './components/AddJurnalModal'
 import EditJurnalModal from './components/EditJurnalModal'
 
 // --- KOMPONENT ---
 export default function JurnalPage() {
-	const [filtered, setFiltered] = useState<Jurnal[]>([])
+	// const [filtered, setFiltered] = useState<Jurnal[]>([])
 	const [search, setSearch] = useState('')
+	const [filterJurnal, setFilterJurnal] = useState('Barchasi')
 	const [editOpen, setEditOpen] = useState(false)
 	const [open, setOpen] = useState(false)
-	const [statusFilter, setStatusFilter] = useState('')
+	const [perPage] = useState(5)
+	const [currentPage, setCurrentPage] = useState(1)
 	const { data: jurnallar = [] } = useJurnallar()
 	const [selectedJurnal, setSelectedJurnal] = useState<Jurnal>()
-	console.log(jurnallar)
 
-	// FILTER & SEARCH
-	useEffect(() => {
-		let result = jurnallar.filter(
-			j =>
-				j.lokomotiv.nomi.toLowerCase().includes(search.toLowerCase()) ||
-				j.yechilganuzel.raqami.toLowerCase().includes(search.toLowerCase()) ||
-				j.yechganXodim.ism.toLowerCase().includes(search.toLowerCase())
-		)
-		if (statusFilter) {
-			result = result.filter(j => j.status === statusFilter)
-		}
-		setFiltered(result)
-	}, [search, statusFilter, jurnallar])
+	const filtered = useMemo(() => {
+		return jurnallar.filter(emp => {
+			const lokomotiv =
+				`${emp.lokomotiv.nomi} ${emp.lokomotiv.zavodRaqami}`.toLowerCase()
+			const searchLower = search.toLowerCase()
+			const matchesSearch =
+				lokomotiv.includes(searchLower) ||
+				emp.qoyilganuzel.uzeltype.nomi.toLowerCase().includes(searchLower)
+			const matchesSex =
+				filterJurnal === 'Barchasi' || emp.status === filterJurnal
+			return matchesSearch && matchesSex
+		})
+	}, [search, filterJurnal, jurnallar])
+
+	// 🔢 Pagination
+	const totalPages = Math.ceil(filtered.length / perPage)
+	const paginated = filtered.slice(
+		(currentPage - 1) * perPage,
+		currentPage * perPage
+	)
+
+	const handlePageChange = (page: number) => setCurrentPage(page)
+
+	const totalEmployees = jurnallar.length
 
 	const getStatusBadge = (status: string) => {
 		switch (status) {
@@ -68,7 +87,7 @@ export default function JurnalPage() {
 						onChange={e => setSearch(e.target.value)}
 						className='max-w-xs'
 					/>
-					{/* <Select value={statusFilter} onValueChange={setStatusFilter}>
+					<Select value={filterJurnal} onValueChange={setFilterJurnal}>
 						<SelectTrigger className='w-[180px]'>
 							<SelectValue placeholder='Status bo‘yicha filter' />
 						</SelectTrigger>
@@ -77,7 +96,7 @@ export default function JurnalPage() {
 							<SelectItem value='Tamirda'>Tamirda</SelectItem>
 							<SelectItem value='Ish holatida'>Ish holatida</SelectItem>
 						</SelectContent>
-					</Select> */}
+					</Select>
 				</div>
 
 				<Button
@@ -92,7 +111,9 @@ export default function JurnalPage() {
 			{/* TABLE */}
 			<Card className=''>
 				<CardHeader>
-					<CardTitle>Jurnallar ro‘yxati</CardTitle>
+					<CardTitle>
+						Jurnallar ro‘yxati <Badge>{totalEmployees}</Badge>
+					</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<div className='overflow-x-auto'>
@@ -114,8 +135,8 @@ export default function JurnalPage() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{filtered ? (
-									filtered.map((j, i) => (
+								{paginated ? (
+									paginated.map((j, i) => (
 										<TableRow key={j._id}>
 											<TableCell>{i + 1}</TableCell>
 											<TableCell>
@@ -162,6 +183,19 @@ export default function JurnalPage() {
 								)}
 							</TableBody>
 						</Table>
+					</div>
+					{/* 🔢 Pagination tugmalari */}
+					<div className='flex justify-center gap-2'>
+						{Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+							<Button
+								key={page}
+								variant={page === currentPage ? 'default' : 'outline'}
+								onClick={() => handlePageChange(page)}
+								className='w-10'
+							>
+								{page}
+							</Button>
+						))}
 					</div>
 				</CardContent>
 			</Card>

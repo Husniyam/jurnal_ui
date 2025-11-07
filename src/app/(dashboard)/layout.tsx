@@ -2,25 +2,12 @@
 
 import Header from '@/components/layout/Header'
 import Sidebar from '@/components/layout/Sidebar'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 
 export default function DashboardLayout({
 	children,
 }: {
 	children: React.ReactNode
 }) {
-	const router = useRouter()
-	const [isClient, setIsClient] = useState(false)
-
-	// useEffect(() => {
-	// 	setIsClient(true)
-	// 	const token = localStorage.getItem('token')
-	// 	if (!token) router.push('/login')
-	// }, [router])
-
-	// if (!isClient) return null
-
 	return (
 		<div className='flex h-screen overflow-hidden'>
 			<Sidebar />

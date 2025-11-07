@@ -12,9 +12,9 @@ import {
 } from '@/components/ui/select'
 import { useSexlar } from '@/hooks/useSex'
 import { useUpdateXodim } from '@/hooks/useXodim'
+import { Sex } from '@/types/sex'
 import { CreateXodimDto, Xodim } from '@/types/xodim'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { xodimSchema, XodimSchema } from './zodXodimSchema'
@@ -25,7 +25,6 @@ interface EditFormProps {
 }
 
 export default function EditForm({ initialData, onClose }: EditFormProps) {
-	const [form, setForm] = useState(initialData)
 	const { data: sexlar = [] } = useSexlar()
 	const { mutateAsync, isPending } = useUpdateXodim()
 
@@ -50,11 +49,11 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 
 	const onSubmit = async (data: CreateXodimDto) => {
 		try {
-			await mutateAsync({ id: form._id, data: data })
+			await mutateAsync({ id: initialData._id, data: data })
 			toast.success('Xodim ma’lumotlari yangilandi ✅')
 			onClose()
 		} catch (err) {
-			toast.error('Yangilashda xatolik yuz berdi ❌')
+			toast.error(`Yangilashda xatolik yuz berdi ❌ ${err}`)
 		}
 	}
 
@@ -66,7 +65,11 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 			{/* Full name */}
 			<div className='space-y-2'>
 				<Label>Ism</Label>
-				<Input placeholder='Ism' {...register('ism')} defaultValue={form.ism} />
+				<Input
+					placeholder='Ism'
+					{...register('ism')}
+					defaultValue={initialData.ism}
+				/>
 				{errors.ism && (
 					<p className='text-sm text-red-500'>{errors.ism.message}</p>
 				)}
@@ -78,7 +81,7 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 				<Input
 					placeholder='Familiya'
 					{...register('familiya')}
-					defaultValue={form.familiya}
+					defaultValue={initialData.familiya}
 				/>
 				{errors.familiya && (
 					<p className='text-sm text-red-500'>{errors.familiya.message}</p>
@@ -100,7 +103,7 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 						)} ${val.slice(5, 7)} ${val.slice(7, 9)}`
 						e.target.value = formatted.trim()
 					}}
-					defaultValue={form.tel}
+					defaultValue={initialData.tel}
 				/>
 			</div>
 
@@ -110,7 +113,7 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 				<Input
 					placeholder='Tabel raqami'
 					{...register('tabelRaqam')}
-					defaultValue={form.tabelRaqam}
+					defaultValue={initialData.tabelRaqam}
 				/>
 				{errors.tabelRaqam && (
 					<p className='text-sm text-red-500'>{errors.tabelRaqam.message}</p>
@@ -124,13 +127,13 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 					<SelectTrigger className='w-full'>
 						<SelectValue
 							placeholder='Sex tanlang'
-							defaultValue={form.sex.nomi}
+							defaultValue={initialData.sex.nomi}
 						/>
 					</SelectTrigger>
 					<SelectContent>
-						{sexlar.map((sex: any) => (
+						{sexlar.map((sex: Sex) => (
 							<SelectItem key={sex._id} value={sex._id}>
-								{sex.nomi} ({sex.joylashuvi})
+								{sex.nomi} ({sex.joylashuv})
 							</SelectItem>
 						))}
 					</SelectContent>
@@ -146,7 +149,7 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 				<Input
 					placeholder='14 xonali JSHSHIR'
 					{...register('jshshir')}
-					defaultValue={form.jshshir}
+					defaultValue={initialData.jshshir}
 				/>
 				{errors.jshshir && (
 					<p className='text-sm text-red-500'>{errors.jshshir.message}</p>
@@ -159,7 +162,7 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 				<Input
 					placeholder='example@mail.com'
 					{...register('email')}
-					defaultValue={form.email}
+					defaultValue={initialData.email}
 				/>
 				{errors.email && (
 					<p className='text-sm text-red-500'>{errors.email.message}</p>

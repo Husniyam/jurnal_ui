@@ -20,7 +20,6 @@ export function AddLokomotivForm({ onClose }: Props) {
 	const {
 		register,
 		handleSubmit,
-		setValue,
 		formState: { errors },
 	} = useForm<LokmotivSchema>({
 		resolver: zodResolver(lokomotivSchema),
@@ -32,8 +31,8 @@ export function AddLokomotivForm({ onClose }: Props) {
 			await mutateAsync(data)
 			onClose()
 			toast.success('Lokomotiv muvaffaqiyatli qo‘shildi ✅')
-		} catch (err: any) {
-			toast.error(err.response?.data?.message || 'Xatolik yuz berdi ❌')
+		} catch (err) {
+			toast.error(`Xatolik yuz berdi ❌ ${err}`)
 		}
 	}
 

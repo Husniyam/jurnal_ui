@@ -4,8 +4,13 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { useLokomotivlar } from '@/hooks/useLokomotiv'
+import { useSexlar } from '@/hooks/useSex'
+import { useUzellar } from '@/hooks/useUzel'
+import { useXodimlar } from '@/hooks/useXodim'
 import { motion } from 'framer-motion'
 import { Building2, TrainFront, Users, Wrench } from 'lucide-react'
+import Link from 'next/link'
 import { useMemo } from 'react'
 import {
 	Bar,
@@ -25,19 +30,12 @@ import {
  * Fake data — keyinchalik API bilan almashtirish oson bo‘lsin uchun oddiy struktura.
  */
 
-// Qisqacha statistikalar
-const fakeCounts = {
-	xodimlar: 124,
-	sexlar: 8,
-	lokomotivlar: 22,
-	uzellar: 548,
-}
-
 // Uzel holatlari pie uchun
 const fakeUzelStatus = [
-	{ name: 'Ish holatida', value: 320 },
-	{ name: 'Sexda', value: 150 },
-	{ name: "Ta'mirda", value: 78 },
+	{ name: 'Ish holatida', value: 0 },
+	{ name: 'Sexda', value: 0 },
+	{ name: 'Tamirda', value: 0 },
+	{ name: 'Nosoz', value: 0 },
 ]
 
 // Sexlar bo‘yicha uzellar (bar chart)
@@ -89,34 +87,62 @@ const fakeJurnallar = [
 ]
 
 // ranglar
-const PIE_COLORS = ['#3b82f6', '#10b981', '#f97316']
+const PIE_COLORS = ['#3b82f6', '#10b981', '#f97316', '#f10']
 
 export default function DashboardPage() {
 	// Pie legend data tayyorlash (recharts tooltip ishlashi uchun)
 	const pieData = useMemo(() => fakeUzelStatus, [])
 	const barData = useMemo(() => fakeSexUzel, [])
 	const journals = useMemo(() => fakeJurnallar, [])
+	const { data: xodimlar = [] } = useXodimlar()
+	const { data: sexlar = [] } = useSexlar()
+	const { data: lokomotivlar = [] } = useLokomotivlar()
+	const { data: uzellar = [] } = useUzellar()
+
+	// --- 1️⃣ Status bo‘yicha guruhlash (PieChart)
+	// const statusData = Object.values(
+	// 	uzellar?.reduce((acc: any, uzel) => {
+	// 		const status = uzel.holati || 'Noma’lum'
+	// 		if (!acc[status]) acc[status] = { name: status, value: 0 }
+	// 		acc[status].value++
+	// 		return acc as UzelStatus[]
+	// 	}, {})
+	// )
+
+	// --- 2️⃣ Sex (joylashuv) bo‘yicha guruhlash (BarChart)
+	// const sexData = Object.values(
+	// 	uzellar.reduce((acc: any, uzel) => {
+	// 		const sex = uzel.sex.nomi || 'Noma’lum'
+	// 		if (!acc[sex]) acc[sex] = { sex, soni: 0 }
+	// 		acc[sex].soni++
+	// 		return acc
+	// 	}, {})
+	// )
 
 	const stats = [
 		{
 			title: 'Xodimlar',
-			value: fakeCounts.xodimlar,
+			value: xodimlar.length,
 			icon: <Users className='w-6 h-6' />,
+			url: 'xodim',
 		},
 		{
 			title: 'Sexlar',
-			value: fakeCounts.sexlar,
+			value: sexlar.length,
 			icon: <Building2 className='w-6 h-6' />,
+			url: 'sex',
 		},
 		{
 			title: 'Lokomotivlar',
-			value: fakeCounts.lokomotivlar,
+			value: lokomotivlar.length,
 			icon: <TrainFront className='w-6 h-6' />,
+			url: 'lokomotiv',
 		},
 		{
 			title: 'Uzellar',
-			value: fakeCounts.uzellar,
+			value: uzellar.length,
 			icon: <Wrench className='w-6 h-6' />,
+			url: 'uzelturlari/uzel',
 		},
 	]
 
@@ -125,9 +151,7 @@ export default function DashboardPage() {
 			<div className='flex items-center justify-between gap-4'>
 				<div>
 					<h1 className='text-3xl font-bold'>Dashboard</h1>
-					<p className='text-sm text-muted-foreground mt-1'>
-						Tizim holati (demo / fake data)
-					</p>
+					<p className='text-sm text-muted-foreground mt-1'>Tizim holati</p>
 				</div>
 
 				{/* qidiruv va quick action */}
@@ -150,15 +174,17 @@ export default function DashboardPage() {
 						transition={{ delay: i * 0.08 }}
 					>
 						<Card className='overflow-hidden'>
-							<CardContent className='flex items-center justify-between gap-4'>
-								<div>
-									<p className='text-sm text-muted-foreground'>{s.title}</p>
-									<p className='text-2xl font-semibold'>{s.value}</p>
-								</div>
-								<div className='grid place-items-center w-12 h-12 rounded-lg bg-muted/40'>
-									{s.icon}
-								</div>
-							</CardContent>
+							<Link href={s.url}>
+								<CardContent className='flex items-center justify-between gap-4'>
+									<div>
+										<p className='text-sm text-muted-foreground'>{s.title}</p>
+										<p className='text-2xl font-semibold'>{s.value}</p>
+									</div>
+									<div className='grid place-items-center w-12 h-12 rounded-lg bg-muted/40'>
+										{s.icon}
+									</div>
+								</CardContent>
+							</Link>
 						</Card>
 					</motion.div>
 				))}

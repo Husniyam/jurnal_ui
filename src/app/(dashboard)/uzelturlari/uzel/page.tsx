@@ -44,13 +44,11 @@ export default function UzelPage() {
 				u.uzeltype.nomi.toLowerCase().includes(search.toLowerCase()) ||
 				u.raqami.toLowerCase().includes(search.toLowerCase())
 		)
-		if (holatFilter) {
-			holatFilter !== 'barchasi'
-				? (result = result.filter(u => u.holati === holatFilter))
-				: (result = result)
+		if (holatFilter && holatFilter !== 'Barchasi') {
+			result = result.filter(u => u.holati === holatFilter)
 		}
 		setFiltered(result)
-	}, [search, holatFilter])
+	}, [search, holatFilter, uzellar])
 
 	// --- JOY FUNKSIYASI ---
 	const getJoy = (uzel: Uzel) => {

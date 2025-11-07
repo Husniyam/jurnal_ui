@@ -8,7 +8,10 @@ import { UzeltypeDto, Uzeltypewith } from '@/types/uzeltype'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { uzeltypeSchema, UzeltypeSchema } from './zodUzelSchema'
+import {
+	uzeltypeSchema,
+	UzeltypeSchema,
+} from '../../components/zodUzeltypeSchema'
 
 interface EditFormProps {
 	initialData: Uzeltypewith
@@ -38,7 +41,7 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 			toast.success('Uzel turi ma’lumotlari yangilandi ✅')
 			onClose()
 		} catch (err) {
-			toast.error('Yangilashda xatolik yuz berdi ❌')
+			toast.error(`Yangilashda xatolik yuz berdi ❌  ${err}`)
 		}
 	}
 

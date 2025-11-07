@@ -57,7 +57,7 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 			toast.success('Jurnal ma’lumotlari yangilandi ✅')
 			onClose()
 		} catch (err) {
-			toast.error('Yangilashda xatolik yuz berdi ❌')
+			toast.error(`Yangilashda xatolik yuz berdi ❌ ${err}`)
 		}
 	}
 

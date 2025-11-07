@@ -21,7 +21,6 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 	const {
 		register,
 		handleSubmit,
-		setValue,
 		formState: { errors },
 	} = useForm<LokmotivSchema>({
 		resolver: zodResolver(lokomotivSchema),
@@ -40,7 +39,7 @@ export default function EditForm({ initialData, onClose }: EditFormProps) {
 			toast.success('Lokomotiv ma’lumotlari yangilandi ✅')
 			onClose()
 		} catch (err) {
-			toast.error('Yangilashda xatolik yuz berdi ❌')
+			toast.error(`Yangilashda xatolik yuz berdi ❌ ${err}`)
 		}
 	}
 
