@@ -109,80 +109,82 @@ export default function JurnalPage() {
 			</div>
 
 			{/* TABLE */}
-			<Card className=''>
+			<Card>
 				<CardHeader>
 					<CardTitle>
 						Jurnallar ro‘yxati <Badge>{totalEmployees}</Badge>
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<div className='overflow-x-auto'>
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>T/r</TableHead>
-									<TableHead>Lokomotiv</TableHead>
-									<TableHead>Uzel turi</TableHead>
-									<TableHead>Yechilgan uzel raqami</TableHead>
-									<TableHead>Yechgan xodim</TableHead>
-									<TableHead>Yechilgan sana</TableHead>
-									<TableHead>Ta’mir turi</TableHead>
-									<TableHead>Qo‘yilgan uzel raqami</TableHead>
-									<TableHead>Qo‘ygan xodim</TableHead>
-									<TableHead>Qo‘yilgan sana</TableHead>
-									<TableHead>Status</TableHead>
-									<TableHead>Amallar</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{paginated ? (
-									paginated.map((j, i) => (
-										<TableRow key={j._id}>
-											<TableCell>{i + 1}</TableCell>
-											<TableCell>
-												{j.lokomotiv?.nomi} {j.lokomotiv?.zavodRaqami}
-											</TableCell>
-											<TableCell>{j.yechilganuzel?.uzeltype.nomi}</TableCell>
-											<TableCell>{j.yechilganuzel?.raqami}</TableCell>
-											<TableCell>
-												{j.yechganXodim?.ism} {j.yechganXodim?.familiya}
-											</TableCell>
-											<TableCell>
-												{j.yechilganSana
-													? j.yechilganSana.toLocaleString().slice(0, 10)
-													: '—'}
-											</TableCell>
-											<TableCell>{j?.tamirTuri}</TableCell>
-											<TableCell>{j.qoyilganuzel?.raqami || '—'}</TableCell>
-											<TableCell>{j.qoyganXodim?.ism || '—'}</TableCell>
-											<TableCell>
-												{j.qoyilganSana
-													? j.qoyilganSana.toLocaleString().slice(0, 10)
-													: '—'}
-											</TableCell>
-											<TableCell>{getStatusBadge(j.status)}</TableCell>
-											<TableCell>
-												<Button
-													className='cursor-pointer'
-													onClick={() => {
-														setSelectedJurnal(j)
-														setEditOpen(!editOpen)
-													}}
-												>
-													Edit
-												</Button>
+					<div className='relative w-full'>
+						<div className='overflow-x-auto'>
+							<Table className='min-w-[1200px] w-full border-collapse'>
+								<TableHeader>
+									<TableRow>
+										<TableHead>T/r</TableHead>
+										<TableHead>Lokomotiv</TableHead>
+										<TableHead>Uzel turi</TableHead>
+										<TableHead>Yechilgan uzel raqami</TableHead>
+										<TableHead>Yechgan xodim</TableHead>
+										<TableHead>Yechilgan sana</TableHead>
+										<TableHead>Ta’mir turi</TableHead>
+										<TableHead>Qo‘yilgan uzel raqami</TableHead>
+										<TableHead>Qo‘ygan xodim</TableHead>
+										<TableHead>Qo‘yilgan sana</TableHead>
+										<TableHead>Status</TableHead>
+										<TableHead>Amallar</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{paginated ? (
+										paginated.map((j, i) => (
+											<TableRow key={j._id}>
+												<TableCell>{i + 1}</TableCell>
+												<TableCell>
+													{j.lokomotiv?.nomi} {j.lokomotiv?.zavodRaqami}
+												</TableCell>
+												<TableCell>{j.yechilganuzel?.uzeltype.nomi}</TableCell>
+												<TableCell>{j.yechilganuzel?.raqami}</TableCell>
+												<TableCell>
+													{j.yechganXodim?.ism} {j.yechganXodim?.familiya}
+												</TableCell>
+												<TableCell>
+													{j.yechilganSana
+														? j.yechilganSana.toLocaleString().slice(0, 10)
+														: '—'}
+												</TableCell>
+												<TableCell>{j?.tamirTuri}</TableCell>
+												<TableCell>{j.qoyilganuzel?.raqami || '—'}</TableCell>
+												<TableCell>{j.qoyganXodim?.ism || '—'}</TableCell>
+												<TableCell>
+													{j.qoyilganSana
+														? j.qoyilganSana.toLocaleString().slice(0, 10)
+														: '—'}
+												</TableCell>
+												<TableCell>{getStatusBadge(j.status)}</TableCell>
+												<TableCell>
+													<Button
+														className='cursor-pointer'
+														onClick={() => {
+															setSelectedJurnal(j)
+															setEditOpen(!editOpen)
+														}}
+													>
+														Edit
+													</Button>
+												</TableCell>
+											</TableRow>
+										))
+									) : (
+										<TableRow>
+											<TableCell colSpan={7} className='text-center py-4'>
+												Hech qanday natija topilmadi 😕
 											</TableCell>
 										</TableRow>
-									))
-								) : (
-									<TableRow>
-										<TableCell colSpan={7} className='text-center py-4'>
-											Hech qanday natija topilmadi 😕
-										</TableCell>
-									</TableRow>
-								)}
-							</TableBody>
-						</Table>
+									)}
+								</TableBody>
+							</Table>
+						</div>
 					</div>
 					{/* 🔢 Pagination tugmalari */}
 					<div className='flex justify-center gap-2'>
